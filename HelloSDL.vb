@@ -1,6 +1,26 @@
 ﻿Imports SDL2.SDL
 
 Public Class HelloSDL
+    Dim running As Boolean
+
+    Public Sub New()
+        running = True
+
+        Setup()
+
+        Do
+            ' basically update & render
+            PollEvents()
+            Render()
+        Loop While running
+
+        CleanUp()
+    End Sub
+
+
+    Dim window As IntPtr
+    Dim renderer As IntPtr
+
     Enum LineFillMode
         None
 
@@ -14,23 +34,6 @@ Public Class HelloSDL
         ''' </summary>
         BF
     End Enum
-
-    Public Sub New()
-        running = True
-
-        Setup()
-
-        Do
-            PollEvents()
-            Render()
-        Loop While running
-
-        CleanUp()
-    End Sub
-
-
-    Dim window As IntPtr
-    Dim renderer As IntPtr
 
     ' Ref: https://jsayers.dev/c-sdl-tutorial-part-2-creating-a-window/
 
@@ -102,11 +105,15 @@ Public Class HelloSDL
         renderer = SDL_CreateRenderer(
             window, -1,
             SDL_RendererFlags.SDL_RENDERER_ACCELERATED Or SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC)
-
-
     End Sub
 
-    Dim running As Boolean
+
+    Sub CleanUp()
+        SDL_DestroyRenderer(renderer)
+        SDL_DestroyWindow(window)
+        SDL_Quit()
+    End Sub
+
 
     Sub PollEvents()
         Dim e As SDL_Event
@@ -130,12 +137,5 @@ Public Class HelloSDL
         Line(30, 10, 50, 30, &H0, LineFillMode.BF)
 
         SDL_RenderPresent(renderer)
-    End Sub
-
-
-    Sub CleanUp()
-        SDL_DestroyRenderer(renderer)
-        SDL_DestroyWindow(window)
-        SDL_Quit()
     End Sub
 End Class
