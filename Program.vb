@@ -1,6 +1,6 @@
-﻿Imports SDL2.SDL
+Imports SDL2.SDL
 
-Module Module1
+Module Program
     Enum LineFillMode
         None
 
@@ -127,7 +127,7 @@ Module Module1
     End Sub
 
 
-    Sub Main()
+    Sub Main(args As String())
         running = True
 
         Setup()
