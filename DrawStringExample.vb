@@ -9,6 +9,8 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/36198732
 ' Example with text width & height
 ' https://stackoverflow.com/questions/22886500
+' Example from C++:
+' https://thenumb.at/cpp-course/sdl2/07/07.html
 
 ' Marshal.PtrToStructure
 ' https://stackoverflow.com/questions/27741351/

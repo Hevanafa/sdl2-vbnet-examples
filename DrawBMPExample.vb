@@ -4,6 +4,9 @@ Imports System.Runtime.InteropServices
 
 Public Class DrawBMPExample
     ' Refs:
+    ' C++ example:
+    ' https://thenumb.at/cpp-course/sdl2/02/02.html
+    ' https://thenumb.at/cpp-course/sdl2/05/05.html
 
     ' Marshal.PtrToStructure
     ' https://stackoverflow.com/questions/27741351/
