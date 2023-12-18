@@ -26,7 +26,7 @@ Public Class DrawBMPExample
 
 
     Dim window_ptr As IntPtr  ' SDL_Window
-    Dim renderer_ptr As IntPtr  ' SDL_Renderer
+    ' in this example, we're blitting directly to the window surface
 
     Dim win_surface_ptr As IntPtr  ' SDL_Surface
     Dim img_ptr As IntPtr  ' SDL_Surface
@@ -36,14 +36,10 @@ Public Class DrawBMPExample
         SDL_Init(SDL_INIT_VIDEO)
 
         window_ptr = SDL_CreateWindow(
-        "Hello SDL",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        320, 240,
-        SDL_WindowFlags.SDL_WINDOW_SHOWN)
-
-        renderer_ptr = SDL_CreateRenderer(
-        window_ptr, -1,
-        SDL_RendererFlags.SDL_RENDERER_ACCELERATED Or SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC)
+            "Hello SDL",
+            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+            320, 240,
+            SDL_WindowFlags.SDL_WINDOW_SHOWN)
 
 
         win_surface_ptr = SDL_GetWindowSurface(window_ptr)
@@ -64,18 +60,8 @@ Public Class DrawBMPExample
     Sub CleanUp()
         SDL_FreeSurface(img_ptr)
 
-        SDL_DestroyRenderer(renderer_ptr)
         SDL_DestroyWindow(window_ptr)
         SDL_Quit()
-    End Sub
-
-
-    Sub SetColour(rgb%)
-        Dim r = CByte(rgb \ &H10000)
-        Dim g = CByte(rgb \ &H100 Mod &H100)
-        Dim b = CByte(rgb Mod &H100)
-
-        SDL_SetRenderDrawColor(renderer_ptr, r, g, b, 255)
     End Sub
 
     Sub PollEvents()
@@ -91,9 +77,6 @@ Public Class DrawBMPExample
 
 
     Sub Render()
-        SetColour(&H6495ED)
-        SDL_RenderClear(renderer_ptr)
-
         Dim dest_rect As New SDL_Rect With {
             .x = 0,
             .y = 0,
@@ -105,7 +88,5 @@ Public Class DrawBMPExample
         SDL_BlitScaled(img_ptr, IntPtr.Zero, win_surface_ptr, dest_rect)
 
         SDL_UpdateWindowSurface(window_ptr)
-
-        'SDL_RenderPresent(renderer_ptr)
     End Sub
 End Class
