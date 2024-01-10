@@ -30,6 +30,16 @@ This example demonstrates how to load a BMP file & blitting directly to window.
 This example demonstrates how to load a PNG file & rendering on the surface.
 
 
+- DrawPNGRotated.vb
+
+This example demonstrates how to load a TTF & PNG file & renders them rotated, each as a texture.
+
+
+- PlaySoundExample.vb
+
+This example demonstrates how to load a WAV file & plays it with Spacebar using `SDL_mixer`.
+
+
 ## Prerequisites
 
 - Microsoft Visual Studio 2022
