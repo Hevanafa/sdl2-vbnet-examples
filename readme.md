@@ -7,37 +7,37 @@ A few examples on how to start using SDL2 with VB.NET.
 
 - Program.vb
 
-This is the starting point of the project.
+	This is the starting point of the project.
 
 
 - HelloSDL.vb
 
-This example demonstrates how to start SDL window & renderer.
+	This example demonstrates how to start SDL window & renderer.
 
 
 - DrawStringExample.vb
 
-This example demonstrates how to draw string with `SDL_ttf`.
+	This  example demonstrates how to draw string with `SDL_ttf`.
 
 
 - DrawBMPExample.vb
 
-This example demonstrates how to load a BMP file & blitting directly to window.
+	This example demonstrates how to load a BMP file & blitting directly to window.
 
 
 - DrawPNGExample.vb
 
-This example demonstrates how to load a PNG file & rendering on the surface.
+	This example demonstrates how to load a PNG file & rendering on the surface.
 
 
 - DrawPNGRotated.vb
 
-This example demonstrates how to load a TTF & PNG file & renders them rotated, each as a texture.
+	This example demonstrates how to load a TTF & PNG file & renders them rotated, each as a texture.
 
 
 - PlaySoundExample.vb
 
-This example demonstrates how to load a WAV file & plays it with Spacebar using `SDL_mixer`.
+	This example demonstrates how to load a WAV file & plays it with Spacebar using `SDL_mixer`.
 
 
 ## Prerequisites
