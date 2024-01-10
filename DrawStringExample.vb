@@ -46,6 +46,17 @@ Public Class DrawStringExample
 
     Dim times As IntPtr
 
+    Sub InitFont()
+        Dim font_dir$ = Environment.GetFolderPath(Environment.SpecialFolder.Fonts)
+
+        TTF_Init()
+        times = TTF_OpenFont(font_dir + "\TIMES.TTF", 20)
+        Dim error$ = TTF_GetError()
+
+        If Not String.IsNullOrWhiteSpace(error$) Then
+            Debug.Print("Error when loading TTF: {0}", error$)
+        End If
+    End Sub
 
     Sub Setup()
         SDL_Init(SDL_INIT_VIDEO)
@@ -60,14 +71,7 @@ Public Class DrawStringExample
             window, -1,
             SDL_RendererFlags.SDL_RENDERER_ACCELERATED Or SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC)
 
-
-        TTF_Init()
-        times = TTF_OpenFont("TIMES.TTF", 20)
-        Dim error$ = TTF_GetError()
-
-        If Not String.IsNullOrWhiteSpace(error$) Then
-            Debug.Print("Error when loading TTF: {0}", error$)
-        End If
+        InitFont()
     End Sub
 
 

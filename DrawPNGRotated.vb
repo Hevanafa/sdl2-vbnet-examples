@@ -66,8 +66,10 @@ Public Class DrawPNGRotated
 
 
         ' load TTF file
+        Dim font_dir$ = Environment.GetFolderPath(Environment.SpecialFolder.Fonts)
+
         TTF_Init()
-        times = TTF_OpenFont("TIMES.TTF", 20)
+        times = TTF_OpenFont(font_dir + "\TIMES.TTF", 20)
         Dim error$ = TTF_GetError()
 
         If Not String.IsNullOrWhiteSpace(error$) Then
