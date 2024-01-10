@@ -1,26 +1,24 @@
 ﻿Imports SDL2.SDL
-Imports SDL2.SDL_image
 Imports SDL2.SDL_ttf
+Imports SDL2.SDL_mixer
 Imports System.Runtime.InteropServices
 
 ' Refs:
-' https://gamedev.stackexchange.com/questions/119605/
-' https://wiki.libsdl.org/SDL2/SDL_RenderCopyEx
+' Sound Effects and Music
+' https://lazyfoo.net/tutorials/SDL/21_sound_effects_and_music/index.php
 
-' Pomni (AI-generated):
-' https://civitai.com/models/169335/pomni-the-amazing-digital-circus
+' SDL_mixer API documentation
+' https://wiki.libsdl.org/SDL2_mixer/CategoryAPI
 
-Public Class DrawPNGRotated
+Public Class PlaySoundExample
     Dim running As Boolean
 
     Public Sub New()
         running = True
 
-        Setup()
+        If Not Setup() Then Exit Sub
 
         Do
-            frame += 1
-
             PollEvents()
             Render()
         Loop While running
@@ -32,6 +30,11 @@ Public Class DrawPNGRotated
     Dim window_ptr As IntPtr
     Dim renderer_ptr As IntPtr
 
+    ''' <summary>
+    ''' TTF_Font
+    ''' </summary>
+    Dim consolas As IntPtr
+
     Sub SetColour(rgb%)
         Dim r = CByte(rgb \ &H10000)
         Dim g = CByte(rgb \ &H100 Mod &H100)
@@ -40,23 +43,18 @@ Public Class DrawPNGRotated
         SDL_SetRenderDrawColor(renderer_ptr, r, g, b, 255)
     End Sub
 
-    ''' <summary>
-    ''' TTF_Font
-    ''' </summary>
-    Dim times As IntPtr
 
-    ''' <summary>
-    ''' SDL_Texture
-    ''' </summary>
-    Dim img_ptr As IntPtr
-    Dim img_w%, img_h%
+    Function Setup() As Boolean
+        If SDL_Init(SDL_INIT_VIDEO Or SDL_INIT_AUDIO) < 0 Then
+            Console.WriteLine(
+                "SDL couldn't start!" + vbCrLf +
+                "Reason: " + SDL_GetError())
 
-
-    Sub Setup()
-        SDL_Init(SDL_INIT_VIDEO)
+            Return False
+        End If
 
         window_ptr = SDL_CreateWindow(
-            "Rotated PNG Texture Example",
+            "Hello SDL",
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
             320, 240,
             SDL_WindowFlags.SDL_WINDOW_SHOWN)
@@ -66,28 +64,47 @@ Public Class DrawPNGRotated
             SDL_RendererFlags.SDL_RENDERER_ACCELERATED Or SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC)
 
 
-        ' load TTF file
+        InitFont()
+        InitAudio()
+
+        Return True
+    End Function
+
+
+    Sub InitFont()
         Dim font_dir$ = Environment.GetFolderPath(Environment.SpecialFolder.Fonts)
 
         TTF_Init()
-        times = TTF_OpenFont(font_dir + "\TIMES.TTF", 20)
+        consolas = TTF_OpenFont(font_dir + "\consola.ttf", 16)
         Dim error$ = TTF_GetError()
 
         If Not String.IsNullOrWhiteSpace(error$) Then
             Debug.Print("Error when loading TTF: {0}", error$)
         End If
-
-
-        ' load PNG file
-        Dim temp = IMG_Load("pomni_2.png")
-        Dim temp_png = Marshal.PtrToStructure(Of SDL_Surface)(temp)
-        img_w = temp_png.w
-        img_h = temp_png.h
-        img_ptr = SDL_CreateTextureFromSurface(renderer_ptr, temp)
-
-        SDL_FreeSurface(temp)
-        Debug.Print(SDL_GetError)
     End Sub
+
+    ''' <summary>
+    ''' Mix_Chunk
+    ''' </summary>
+    Dim snare_sfx_ptr As IntPtr
+
+    Function InitAudio() As Boolean
+        If Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0 Then
+            Console.WriteLine(
+                "Couldn't open audio mixer." + vbCrLf +
+                "Reason: " + Mix_GetError())
+
+            Return False
+        End If
+
+        snare_sfx_ptr = Mix_LoadWAV("snare.wav")
+        If snare_sfx_ptr = IntPtr.Zero Then
+            Console.WriteLine("Failed to load snare SFX.  Reason: " + Mix_GetError())
+            Return False
+        End If
+
+        Return True
+    End Function
 
 
     Sub PollEvents()
@@ -97,12 +114,25 @@ Public Class DrawPNGRotated
             Select Case e.type
                 Case SDL_EventType.SDL_QUIT
                     running = False
+
+                Case SDL_EventType.SDL_KEYDOWN
+                    If e.key.keysym.sym = SDL_Keycode.SDLK_SPACE Then _
+                        PlaySound()
+
             End Select
         Loop While SDL_PollEvent(e) = 1
     End Sub
 
 
-    Sub DrawRotatedText()
+    Sub PlaySound()
+        Mix_PlayChannel(-1, snare_sfx_ptr, 0)
+    End Sub
+
+
+    Sub Render()
+        SetColour(&H6495ED)
+        SDL_RenderClear(renderer_ptr)
+
         Dim white As New SDL_Color With {
             .r = 255,
             .g = 255,
@@ -110,7 +140,7 @@ Public Class DrawPNGRotated
             .a = 0
         }
 
-        Dim surface_ptr = TTF_RenderText_Solid(times, "Hello SDL!", white)
+        Dim surface_ptr = TTF_RenderText_Solid(consolas, "Press Spacebar to play sound", white)
         Dim surface = Marshal.PtrToStructure(Of SDL_Surface)(surface_ptr)
 
         Dim txt_width = surface.w
@@ -125,60 +155,30 @@ Public Class DrawPNGRotated
 
         Dim texture = SDL_CreateTextureFromSurface(renderer_ptr, surface_ptr)
 
-        'SDL_RenderCopy(renderer, texture, IntPtr.Zero, dst_rect)
-        SDL_RenderCopyEx(renderer_ptr, texture, IntPtr.Zero, dst_rect, 15, IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE)
+        SDL_RenderCopy(renderer_ptr, texture, IntPtr.Zero, dst_rect)
 
         SDL_FreeSurface(surface_ptr)
         SDL_DestroyTexture(texture)
-    End Sub
-
-
-    Dim frame%
-    Function Deg2Rad#(deg#)
-        Deg2Rad = deg / 180 * Math.PI
-    End Function
-
-    Sub DrawRotatedTexture()
-        Dim dest_rect As New SDL_Rect With {
-            .x = (320 - img_w) \ 2,
-            .y = 0,
-            .w = img_w,
-            .h = img_h
-        }
-
-        'Dim centre As New SDL_Point With {
-        '    .x = 160,
-        '    .y = 120
-        '}
-
-        SDL_RenderCopyEx(
-            renderer_ptr, img_ptr,
-            IntPtr.Zero, dest_rect,
-            frame,  ' in degrees
-            IntPtr.Zero, SDL_RendererFlip.SDL_FLIP_NONE)  ' centre
-    End Sub
-
-
-    Sub Render()
-        SetColour(&H6495ED)
-        SDL_RenderClear(renderer_ptr)
-
-
-        DrawRotatedText()
-        DrawRotatedTexture()
 
         SDL_RenderPresent(renderer_ptr)
     End Sub
 
 
     Sub CleanUp()
-        TTF_CloseFont(times)
-        TTF_Quit()
+        TTF_CloseFont(consolas)
+        consolas = IntPtr.Zero
 
-        SDL_DestroyTexture(img_ptr)
+        Mix_FreeChunk(snare_sfx_ptr)
+        snare_sfx_ptr = IntPtr.Zero
 
         SDL_DestroyRenderer(renderer_ptr)
         SDL_DestroyWindow(window_ptr)
+        renderer_ptr = IntPtr.Zero
+        window_ptr = IntPtr.Zero
+
+        ' Quit SDL subsystems
+        TTF_Quit()
+        Mix_Quit()
         SDL_Quit()
     End Sub
 End Class
