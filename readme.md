@@ -54,3 +54,13 @@ It is compatible with .NET Core 6, x64 processor architecture.  It is also bundl
 
 The SDL2 bindings are from: https://github.com/flibitijibibo/SDL2-CS/
 
+In case the dependencies aren't loaded / installed, you can reinstall them with these steps:
+
+1. On Visual Studio, open **Tools** menu --> NuGet Package Manager --> Package Manager Console,
+2. Use this command:
+	```
+	Update-Package -reinstall
+	```
+
+[Reference](https://stackoverflow.com/questions/6876732/)
+
